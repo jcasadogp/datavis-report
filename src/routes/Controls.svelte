@@ -1,9 +1,12 @@
 <script>
-
+    // Imports
+    import {Button, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Styles} from 'sveltestrap';
+    
+    // Properties 
     export let carstops_data = [];
     export let selected_car_id = 0;
 
-    const car_ids = [... new Set(carstops_data.map(c => c.car))].sort();
+    const car_ids = [... new Set(carstops_data.map(c => c.car))].sort(function(a, b){return a - b});
     
     console.log(car_ids)
     
@@ -14,22 +17,23 @@
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
 
-    // console.log(carstops_data)
-
-    // for(let i = 0; i < carstops_data.length; i++){
-    //     console.log(carstops_data[i].car)
-    // }
 </script>
 
 <h2>Overview</h2>
 
 <div>
-    <form>
-        {#each car_ids as car_id}
-            <label>
-            <input type=radio bind:group={selected_car_id} value={car_id}>
+Select a car to highlight:
+<select bind:value={selected_car_id}>
+    {#each car_ids as car_id}
+        <option value={car_id}>
             Car {car_id}
-            </label>
-        {/each}
-    </form>
+        </option>
+    {/each}
+</select>
 </div>
+
+<style>
+    div{
+        margin-bottom: 10px
+    }
+</style>
