@@ -4,11 +4,9 @@
     
     // Properties 
     export let carstops_data = [];
-    export let selected_car_id = 0;
+    export let selected_car_id = undefined;
 
     const car_ids = [... new Set(carstops_data.map(c => c.car))].sort(function(a, b){return a - b});
-    
-    console.log(car_ids)
     
     // Dimensions
     const width = 620;
@@ -31,6 +29,10 @@ Select a car to highlight:
     {/each}
 </select>
 </div>
+
+{#if selected_car_id != undefined}
+<div>Go to <a href={selected_car_id}>details</a> for car {selected_car_id}.</div>
+{/if}
 
 <style>
     div{

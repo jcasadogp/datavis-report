@@ -1,16 +1,23 @@
 <script>
+    // Imports
     import { onMount } from 'svelte';
 
     import Map from "./Map.svelte";
     import Controls from "./Controls.svelte";
 
+    // Properties
     let gps_data = null;
     let carstops_data = null;
     let businesses_data = null;
 
     export let selected_car_id = undefined;
 
+    // Load the data
     onMount(async () => {
+
+        // console.log('Back to onMount of routes/Exercise.svelte')
+        selected_car_id = undefined;
+
         const gps_res = await fetch('/data/vast2021_gps_coordinates.json')
         gps_data = await gps_res.json()
 
@@ -26,7 +33,6 @@
   <p>Loading the data, please wait...</p>
 {:else}
     <div>
-        <h1>{selected_car_id}</h1>
         <Controls bind:selected_car_id={selected_car_id} carstops_data={carstops_data}/>
     </div>
     <div>

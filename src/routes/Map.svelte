@@ -36,7 +36,7 @@
     
 </script>
 
-<h1>{selected_car_id}</h1>
+<!-- <h1>{selected_car_id}</h1> -->
 
 <svg width={width} height={height}>
     <g transform="translate({margin.left},{margin.top})">
@@ -69,18 +69,18 @@
     
 </svg>
 
-{#if selected_car_id != undefined}
+<!-- {#if selected_car_id != undefined}
 <div id="tooltip" style="left: {mouse_x + 10}px; top: {mouse_y - 10}px">
 <svg class="tooltip" width=20 height=20>
     Hola
 </svg><br/>
 </div>
-{/if}
+{/if} -->
 
 <style>
     
     svg{
-        border: 1px solid black;
+        /* border: 1px solid black; */
     }
     /* rect {
         fill: blue;
