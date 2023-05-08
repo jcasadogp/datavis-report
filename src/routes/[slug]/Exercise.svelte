@@ -4,6 +4,7 @@
     import { axisLeft, axisBottom } from 'd3-axis';
     import { select } from 'd3-selection';
     import { schemeTableau10 } from "d3-scale-chromatic";
+    import { invalidate, invalidateAll } from '$app/navigation';
     
     // Properties
     export let gps_data_slug = undefined;
@@ -24,12 +25,15 @@
     if (car_ids.indexOf(selected_car_id)==0){
         previous_car_id = selected_car_id;
         next_car_id = car_ids[car_ids.indexOf(selected_car_id) +1]
+        invalidateAll();
     } else if(car_ids.indexOf(selected_car_id)==car_ids.length-1){
         previous_car_id = car_ids[car_ids.indexOf(selected_car_id) -1];
         next_car_id = selected_car_id;
+        invalidateAll();
     } else {
         previous_car_id = car_ids[car_ids.indexOf(selected_car_id) -1];
         next_car_id = car_ids[car_ids.indexOf(selected_car_id) +1]
+        invalidateAll();
     }
 
     // Dimensions
@@ -68,6 +72,27 @@
         let current_second_day = (cmt % 1440) *60;
         return [current_day, current_second_day]
     }
+    
+    function go_previous_car(event) {
+        if (car_ids.indexOf(selected_car_id)==0){
+            previous_car_id = selected_car_id;
+        } else {
+            previous_car_id = car_ids[car_ids.indexOf(selected_car_id) -1];
+            selected_car_id = previous_car_id
+        }
+        invalidateAll();
+    }
+
+    function go_next_car(event) {
+        if(car_ids.indexOf(selected_car_id)==car_ids.length-1){    
+            next_car_id = selected_car_id;
+        } else {
+            next_car_id = car_ids[car_ids.indexOf(selected_car_id) +1]
+            selected_car_id = next_car_id
+        }
+        invalidateAll();
+    }
+
 
 </script>
 
@@ -78,8 +103,8 @@
         <a href="/">Car overview</a>
     </tr>
     <tr>
-      <td><a href="{previous_car_id}">Previous car</a></td>
-      <td><a href="{next_car_id}">Next car</a></td>
+      <td><a on:click={go_previous_car} href="{previous_car_id}">Previous car</a></td>
+      <td><a on:click={go_next_car} href="{next_car_id}">Next car</a></td>
     </tr>
 </table>
 
