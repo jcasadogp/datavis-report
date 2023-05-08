@@ -15,9 +15,6 @@
     // Load the data
     onMount(async () => {
 
-        // console.log('Back to onMount of routes/Exercise.svelte')
-        selected_car_id = undefined;
-
         const gps_res = await fetch('/data/vast2021_gps_coordinates.json')
         gps_data = await gps_res.json()
 
@@ -36,7 +33,7 @@
         <Controls bind:selected_car_id={selected_car_id} carstops_data={carstops_data}/>
     </div>
     <div>
-        <Map bind:selected_car_id={selected_car_id} gps_data={gps_data} carstops_data={carstops_data} businesses_data={businesses_data}/>
+        <Map bind:selected_car_id={selected_car_id} gps_data={gps_data} businesses_data={businesses_data}/>
     </div>
 {/if}
 

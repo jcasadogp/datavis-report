@@ -4,7 +4,7 @@
     import { axisLeft, axisBottom } from 'd3-axis';
     import { select } from 'd3-selection';
     import { schemeTableau10 } from "d3-scale-chromatic";
-    import { invalidate, invalidateAll } from '$app/navigation';
+    import { invalidateAll } from '$app/navigation';
     
     // Properties
     export let gps_data_slug = undefined;
@@ -14,27 +14,12 @@
     export let cumulative_minute_total = 0;
 
     let hours = [0, 6, 12, 18, 24];
-    // let days = [... new Set(gps_data_slug.map(d => d.day))].sort(function(a, b){return a - b});
-    // let locations = [... new Set(carstops_data_slug.map(d => d.location.location_type))];
-    // console.log(locations)
 
     let selected_car_id = gps_data_slug[0].car_id;
     let previous_car_id;
     let next_car_id;
 
-    if (car_ids.indexOf(selected_car_id)==0){
-        previous_car_id = selected_car_id;
-        next_car_id = car_ids[car_ids.indexOf(selected_car_id) +1]
-        invalidateAll();
-    } else if(car_ids.indexOf(selected_car_id)==car_ids.length-1){
-        previous_car_id = car_ids[car_ids.indexOf(selected_car_id) -1];
-        next_car_id = selected_car_id;
-        invalidateAll();
-    } else {
-        previous_car_id = car_ids[car_ids.indexOf(selected_car_id) -1];
-        next_car_id = car_ids[car_ids.indexOf(selected_car_id) +1]
-        invalidateAll();
-    }
+    let selected_carstop = undefined;
 
     // Dimensions
     const width = 350;
@@ -51,7 +36,7 @@
     const latScale = scaleLinear().domain([min(gps_data_slug, d => d.lat), max(gps_data_slug, d => d.lat)]).range([innerHeight, 0]);
     const busScale = scaleOrdinal(schemeTableau10).domain(carstops_data_slug.map(b => b.location.location_type));
     
-    const hourScale = scaleLinear().domain([0, 24]).range([0, innerWidth]) //seconds to width
+    const hourScale = scaleLinear().domain([0, 24]).range([0, innerWidth]) //hours to width
     const timeScale = scaleLinear().domain([0, 86400]).range([0, innerWidth]) //seconds to width
     const dayScale = scaleLinear().domain([6, 20]).range([0, innerHeight])
     
@@ -67,13 +52,13 @@
         let xAxis = axisGen.ticks(5).tickValues((hours))(select(handle))
     }
 
-    $: get_cum_minutes_index = function(cmt) {
+    $: getCumMinutesIndex = function(cmt) {
         let current_day = Math.floor(cmt / 1440) + 6;
         let current_second_day = (cmt % 1440) *60;
         return [current_day, current_second_day]
     }
     
-    function go_previous_car(event) {
+    function goPreviousCar(event) {
         if (car_ids.indexOf(selected_car_id)==0){
             previous_car_id = selected_car_id;
         } else {
@@ -83,7 +68,7 @@
         invalidateAll();
     }
 
-    function go_next_car(event) {
+    function goNextCar(event) {
         if(car_ids.indexOf(selected_car_id)==car_ids.length-1){    
             next_car_id = selected_car_id;
         } else {
@@ -93,18 +78,21 @@
         invalidateAll();
     }
 
-
+    let mouse_x, mouse_y;
+    const setMousePosition = function(event) {
+        mouse_x = event.clientX;
+        mouse_y = event.clientY;
+    }
 </script>
 
 {#if gps_data_slug && carstops_data_slug && car_ids}
-
 <table>
     <tr>
         <a href="/">Car overview</a>
     </tr>
     <tr>
-      <td><a on:click={go_previous_car} href="{previous_car_id}">Previous car</a></td>
-      <td><a on:click={go_next_car} href="{next_car_id}">Next car</a></td>
+      <td><a on:click={goPreviousCar} href="{previous_car_id}">Previous car</a></td>
+      <td><a on:click={goNextCar} href="{next_car_id}">Next car</a></td>
     </tr>
 </table>
 
@@ -128,18 +116,22 @@
     </g>
 </svg>
 
+
 <!-- Right part: hours box -->
 <svg width={width} height={height}>
     <g transform="translate({margin.left},{margin.top})">
         
         <!-- Bar plot -->
         {#each carstops_data_slug as carstop, i}
+        <!-- svelte-ignore a11y-mouse-events-have-key-events -->
             <rect 
                 x={timeScale(carstop.start.time) +1}
                 y={dayScale(carstop.start.day)} 
                 width={timeScale(carstop.end.time - carstop.start.time)} 
                 height={dayHeight-2} 
                 fill={busScale(carstop.location.location_type)}
+                on:mouseover={function(event) {selected_carstop = carstop; setMousePosition(event)}}
+                on:mouseout={function() {selected_carstop = undefined}}
                 />
         {/each}
         
@@ -149,10 +141,10 @@
 
         <!-- Moving bar -->
         <line 
-            x1={timeScale(get_cum_minutes_index(cumulative_minute_total)[1])} 
-            x2={timeScale(get_cum_minutes_index(cumulative_minute_total)[1])}
-            y1={dayScale(get_cum_minutes_index(cumulative_minute_total)[0])}
-            y2={dayScale(get_cum_minutes_index(cumulative_minute_total)[0]) +dayHeight-2}
+            x1={timeScale(getCumMinutesIndex(cumulative_minute_total)[1])} 
+            x2={timeScale(getCumMinutesIndex(cumulative_minute_total)[1])}
+            y1={dayScale(getCumMinutesIndex(cumulative_minute_total)[0])}
+            y2={dayScale(getCumMinutesIndex(cumulative_minute_total)[0]) +dayHeight-2}
             stroke="black" 
             stroke-width="3" 
             fill-opacity="1"/>
@@ -173,7 +165,19 @@
 
 {/if}
 
+<!-- Hover over the hours box -->
+{#if selected_carstop != undefined}
+<div id="tooltip" style="left: {mouse_x + 10}px; top: {mouse_y - 10}px">
+    <svg class="tooltip">
+        <g transform="translate(0,15)">
+            <text x="0" y="0">{selected_carstop.location.name} ({selected_carstop.location.location_type})</text>
+        </g>
+    </svg>
+    <br/>
+</div>
+{/if}
 
+<!-- Styles -->
 <style>
     div{
         width: 300px;
@@ -189,5 +193,17 @@
     circle.car_window{
         fill: red;
         fill-opacity: 1;
+    }
+    #tooltip {
+        width: 170px;
+        height: 20px;
+        position: fixed;
+        background-color: white;
+        padding: 3px;
+        border: solid 1px;
+    }
+    svg.tooltip {
+        margin: 0px;
+        padding: 0px;
     }
 </style>

@@ -2,18 +2,14 @@
     // Imports
     import { scaleLinear, scaleOrdinal } from 'd3-scale';
     import { min, max} from "d3-array";
-    // import { axisLeft, axisBottom } from 'd3-axis';
-    // import { select } from 'd3-selection';
-    // import { each } from 'svelte/internal';
     import { schemeTableau10 } from "d3-scale-chromatic";
     
     // Properties
     export let gps_data = [];
-    export let carstops_data = [];
     export let businesses_data = [];
 
     export let selected_car_id = undefined;
-    let selected_datapoint = undefined;
+    let selected_business = undefined;
 
     // Dimensions
     const width = 620;
@@ -27,70 +23,70 @@
     const latScale = scaleLinear().domain([min(gps_data, d => d.lat), max(gps_data, d => d.lat)]).range([innerHeight, 0]);
     const busScale = scaleOrdinal(schemeTableau10).domain(businesses_data.map(b => b.type));
 
+
+    // Functions
     let mouse_x, mouse_y;
     const setMousePosition = function(event) {
+        console.log(selected_business)
         mouse_x = event.clientX;
         mouse_y = event.clientY;
     }
-
-    
 </script>
 
-<!-- <h1>{selected_car_id}</h1> -->
-
-<svg width={width} height={height}>
+<!-- Map of all the gps datapoints and businesses points -->
+<svg id="gps_map" width={width} height={height}>
     <g transform="translate({margin.left},{margin.top})">
+       
+        <!-- GPS datapoints -->
         {#each gps_data as gps_datapoint}
             <circle 
                 cx={longScale(gps_datapoint.long)} 
                 cy={latScale(gps_datapoint.lat)} 
                 r=3
-                on:mouseover={function(event) {selected_datapoint = gps_datapoint; setMousePosition(event)}} 
-                on:focus={function(event) {selected_datapoint = gps_datapoint; setMousePosition(event)}} 
-        
-                on:mouseout={function() {selected_datapoint = undefined}}
-                on:blur={function() {selected_datapoint = undefined}}
-
                 class:selected="{selected_car_id && gps_datapoint.car_id == selected_car_id}"
                 fill="black"
                 fill-opacity="0.01"
                 >
             </circle>
         {/each}
+        
+        <!-- Businesses point of interest -->
         {#each businesses_data as business_datapoint}
+        <!-- svelte-ignore a11y-mouse-events-have-key-events -->
+        <!-- businesses_data[0] -->
             <circle 
                 cx={longScale(business_datapoint.long)} 
                 cy={latScale(business_datapoint.lat)} 
                 fill={busScale(business_datapoint.type)}
+                on:mouseover={function(event) {selected_business = business_datapoint; setMousePosition(event)}}
+                on:mouseout={function() {selected_business = undefined}}
                 r=6>
             </circle>
         {/each}
     </g>
-    
 </svg>
 
-<!-- {#if selected_car_id != undefined}
+<!-- Hover tooltip box -->
+{#if selected_business != undefined}
 <div id="tooltip" style="left: {mouse_x + 10}px; top: {mouse_y - 10}px">
-<svg class="tooltip" width=20 height=20>
-    Hola
-</svg><br/>
+    <svg class="tooltip">
+        <g transform="translate(0,15)">
+            <text x="10" y="10">{selected_business.name}</text>
+        </g>
+    </svg>
+    <br/>
 </div>
-{/if} -->
+{/if}
 
+<!-- Styles -->
 <style>
-    
-    svg{
-        /* border: 1px solid black; */
-    }
-    /* rect {
-        fill: blue;
-        opacity: 0.05;
-    } */
     circle.selected {
         fill: red;
         fill-opacity: 1;
     }
     #tooltip {
+        width: 170px;
+        height: 20px;
         position: fixed;
         background-color: white;
         padding: 3px;

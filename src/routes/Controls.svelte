@@ -1,7 +1,7 @@
 <script>
     // Imports
-    import {Button, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Styles} from 'sveltestrap';
-    
+    import 'bootstrap/dist/css/bootstrap.min.css';
+
     // Properties 
     export let carstops_data = [];
     export let selected_car_id = undefined;
@@ -15,27 +15,35 @@
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
 
+    // Functions
+    function resetCarId(){
+        selected_car_id = undefined;
+    }
+
 </script>
 
 <h2>Overview</h2>
-
 <div>
 Select a car to highlight:
+<!-- Select -->
 <select bind:value={selected_car_id}>
     {#each car_ids as car_id}
-        <option value={car_id}>
-            Car {car_id}
-        </option>
+        <option value={car_id}>Car {car_id}</option>
     {/each}
 </select>
+<!-- <button class="reset" on:click={resetCarId} fill="red">Reset Car Id</button> -->
+<button type="button" class="btn btn-warning btn-sm" on:click={resetCarId}>Reset Car Id</button>
 </div>
 
+<!-- Link to details path -->
 {#if selected_car_id != undefined}
 <div>Go to <a href={selected_car_id}>details</a> for car {selected_car_id}.</div>
 {/if}
 
+<!-- Styles -->
 <style>
     div{
-        margin-bottom: 10px
+        margin-bottom: 10px;
+        font-family: sans-serif;
     }
 </style>
