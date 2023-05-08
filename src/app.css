@@ -12,9 +12,23 @@ nav {
 
 .output {
 	padding: 5px;
-	border: 1px solid black;
+	/* border: 1px solid black; */
 }
 
 h1{
+	font-family: sans-serif;
 	text-align: center;
 }
+h2{
+	font-family: sans-serif;
+}
+table.tr{
+	font-family: sans-serif;
+}
+p{
+	font-family: sans-serif;
+}
+/* text{
+	font-family: sans-serif;
+	color: black
+} */
