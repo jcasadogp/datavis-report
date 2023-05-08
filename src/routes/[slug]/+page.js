@@ -1,10 +1,6 @@
-// Imports
-import { onMount } from 'svelte';
-
 // Properties
 let gps_data_slug = null;
 let carstops_data_slug = null;
-// let businesses_data_slug = null;
 
 export function load({ fetch, params }) {
     const fetchCar = async () => {
@@ -16,11 +12,9 @@ export function load({ fetch, params }) {
         const carstops_data = await carstops_res.json()
         carstops_data_slug = carstops_data.filter((d) => { return d.car == params.slug})
 
-        // const businesses_res = await fetch('/data/vast2021_businesses.json')
-        // const businesses_data = await businesses_res.json()
-        // businesses_data_slug = businesses_data.filter((d) => { return d.car_id == params.slug})[0]
+        const car_ids = [... new Set(carstops_data.map(c => c.car))].sort(function(a, b){return a - b});
         
-        return [gps_data_slug, carstops_data_slug]
+        return [gps_data_slug, carstops_data_slug, car_ids]
     }
 
     return {

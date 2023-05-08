@@ -45,7 +45,7 @@
     {#if !data}
     <p>Loading data...</p>
     {:else}
-    <Exercise gps_data_slug={data.car[0]} carstops_data_slug={data.car[1]}/>
+    <Exercise gps_data_slug={data.car[0]} carstops_data_slug={data.car[1]} car_ids={data.car[2]}/>
     {/if}
   </div>
   
