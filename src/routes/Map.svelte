@@ -27,7 +27,6 @@
     // Functions
     let mouse_x, mouse_y;
     const setMousePosition = function(event) {
-        console.log(selected_business)
         mouse_x = event.clientX;
         mouse_y = event.clientY;
     }
@@ -67,14 +66,15 @@
 </svg>
 
 <!-- Hover tooltip box -->
+<!--  -->
+<!-- class="tooltip"-->
 {#if selected_business != undefined}
 <div id="tooltip" style="left: {mouse_x + 10}px; top: {mouse_y - 10}px">
-    <svg class="tooltip">
-        <g transform="translate(0,15)">
-            <text x="10" y="10">{selected_business.name}</text>
+    <svg width=170 height=20>
+        <g transform="translate(10,15)">
+            <text>{selected_business.name}</text>
         </g>
     </svg>
-    <br/>
 </div>
 {/if}
 
@@ -85,8 +85,6 @@
         fill-opacity: 1;
     }
     #tooltip {
-        width: 170px;
-        height: 20px;
         position: fixed;
         background-color: white;
         padding: 3px;

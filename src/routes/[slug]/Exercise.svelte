@@ -168,7 +168,7 @@
 <!-- Hover over the hours box -->
 {#if selected_carstop != undefined}
 <div id="tooltip" style="left: {mouse_x + 10}px; top: {mouse_y - 10}px">
-    <svg class="tooltip">
+    <svg width=170 height=20>
         <g transform="translate(0,15)">
             <text x="0" y="0">{selected_carstop.location.name} ({selected_carstop.location.location_type})</text>
         </g>
@@ -195,8 +195,6 @@
         fill-opacity: 1;
     }
     #tooltip {
-        width: 170px;
-        height: 20px;
         position: fixed;
         background-color: white;
         padding: 3px;
